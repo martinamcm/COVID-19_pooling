@@ -3,15 +3,14 @@
 #                                                  #
 ####################################################
 
-library('boot')
-library('cubature')
-library('ggplot2')
-library('viridis')
-library('distrEx')
+
+
+# 1.  Forward generation time  --------------------------------------------
 
 
 ## Assign shape/scale to gamma dist for forward generation time f(a)
-  a <- seq(0,30,1) # Time since index infection (days)
+  
+a <- seq(0,30,1) # Time since index infection (days)
   
   # Li et al.
   sh_Li = 4.8685
@@ -21,20 +20,35 @@ library('distrEx')
   sh_Park = 1.960923
   sc_Park = 4.334694
     
-## Define survivor function
-  ## Sensitivity functions that depend on age of infection 'a'
+
+
+# Sensitivity functions over time -----------------------------------------
+
+  
+  # Sensitivity functions that depend on age of infection 'a'
  
   # Kucirka et al. (2020)
- se_time_K <- function(a){
-   ifelse(a<=21,inv.logit(-29.966+37.713*log(a)-14.452*(log(a))^2+1.721*
-                                  (log(a))^3),inv.logit(6.878-2.436*log(a)))
+ 
+  se_time_K <- function(a){
+   ifelse(a<=21,
+          inv.logit(-29.966+37.713*log(a)-14.452*(log(a))^2+1.721*(log(a))^3),
+          inv.logit(6.878-2.436*log(a))
+          )
  }
  
  # Hellewell et al. (2020) 
- se_time_H <- function(a){
-   ifelse(a<=3.272221,inv.logit(1.592913+2.168557*(a-3.272221)),
-                                  inv.logit(1.592913-0.2273548*(a-3.272221)))
+
+   se_time_H <- function(a){
+   ifelse(
+     a<=3.272221,
+     inv.logit(1.592913+2.168557*(a-3.272221)),
+     inv.logit(1.592913-0.2273548*(a-3.272221))
+     )
  }
+
+
+
+# Survivor functions P(T>tau) ---------------------------------------------
 
 
  Tcut_Hlow <- function(a,tau,rel){
@@ -59,6 +73,7 @@ library('distrEx')
    return(PrTa)
  }
  
+   
  Tcut_K <- function(a,tau,rel){
    
    if(a<tau){
@@ -83,7 +98,6 @@ library('distrEx')
  
  
  
- 
  intTa <- function(a,tau,rel){
    
    integ <- 1-unlist(sapply(a,function(x){
@@ -101,6 +115,13 @@ library('distrEx')
    return(integ)
  }
   
+ 
+ 
+
+
+# Transmission curve ------------------------------------------------------
+
+ 
 tran_curve_K <- function(a,tau,rel,shape,scale,R0){
 
   lambda = R0*dgamma(a,shape=shape,scale=scale)
@@ -134,5 +155,4 @@ tran_curve_notest <- function(a,tau,shape,scale,R0){
   return(tran)
 }
 
- ################################################
 
