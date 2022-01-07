@@ -101,7 +101,7 @@ a <- seq(0,30,1) # Time since index infection (days)
  intTa <- function(a,tau,rel){
    
    integ <- 1-unlist(sapply(a,function(x){
-            adaptIntegrate(Tcut_H,lower = 0,upper = x,tau=tau,rel=rel)})[1,])
+            adaptIntegrate(Tcut_Hlow,lower = 0,upper = x,tau=tau,rel=rel)})[1,])
    
    return(integ)
  }
@@ -134,7 +134,7 @@ tran_curve_K <- function(a,tau,rel,shape,scale,R0){
 }
 
 
-tran_curve_H <- function(a,tau,rel,shape,scale,R0){
+tran_curve_H <- function(a, tau, rel, shape, scale, R0){
   
   lambda = R0*dgamma(a,shape=shape,scale=scale)
   ProbTa = intTa(a,tau,rel)

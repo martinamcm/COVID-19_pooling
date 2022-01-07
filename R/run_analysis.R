@@ -7,14 +7,17 @@
 
 # Load libraries
 
-library('pacman')
-p_load(tidyverse, dplyr, viridis, ggExtra, ggpubr, scales, ggplot2, here, boot, cubature, distrEx)
+
+pacman::p_load(
+  tidyverse, dplyr, viridis, ggExtra, ggpubr, scales, ggplot2, here, boot, 
+  cubature, distrEx, tvgeom, deSolve, EpiModel, gtable, grid
+  )
 
 # Load scripts
 
-source('sens_pool.R')
-source('expected_tests.R')
-source('estimate_Rt.R')
-source('outbreak_sim_paper.R')
+source(here('R', 'sens_pool.R'))
+source(here('R', 'expected_tests.R'))
+source(here('R', 'estimate_Rt.R'))
+source(here('R', 'outbreak_sim_paper.R'))
 
 

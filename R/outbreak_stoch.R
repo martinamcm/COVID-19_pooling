@@ -1,9 +1,13 @@
+#####################################################################
+# Determine expected size of the outbreak under each testing strategy 
+#
+#####################################################################
 
-library(tvgeom)
 
-##############################
-#Cumulative number of cases
-##############################
+
+# 1.  Cumulative number of cases - stochastic  --------------------------------
+
+
 
 inf_time <- function(n,result,RCHEpop){
  
@@ -11,29 +15,118 @@ mean <- vector()
 lower <- vector()
 upper <- vector()
 
-pois_mean <- RCHEpop-sapply(1:3,function(x){result[,x]$S})
+pois_mean <- 
+  RCHEpop - sapply(
+    1:3,
+    function(x){
+      result[,x]$S
+      }
+    )
 #pois_mean <- RCHEpop-sapply(1:3,function(x){result$S})  
 
-  samp <- apply(pois_mean,c(1,2),rpois,n=100)
+  samp <- 
+    apply(
+      pois_mean,
+      c(1,2),
+      rpois,
+      n=100
+      )
   
-  meanRl <- apply(samp[,,1],2,median)
-    lowerRl <- apply(samp[,,1],2,quantile,probs=0.025)
-      upperRl <- apply(samp[,,1],2,quantile,probs=0.975)
+  meanRl <- 
+    apply(
+      samp[,,1],
+      2,
+      median
+      )
+  
+  lowerRl <- 
+    apply(
+      samp[,,1],
+      2,
+      quantile,
+      probs = 0.025
+      )
+    
+  upperRl <- 
+    apply(
+      samp[,,1],
+      2,
+      quantile,
+      probs = 0.975
+      )
 
-  meanR <- apply(samp[,,2],2,median)
-    lowerR <- apply(samp[,,2],2,quantile,probs=0.025)
-      upperR <- apply(samp[,,2],2,quantile,probs=0.975)
+  meanR <- 
+    apply(
+      samp[,,2],
+      2,
+      median
+      )
   
-  meanRh <- apply(samp[,,3],2,median)
-    lowerRh <- apply(samp[,,3],2,quantile,probs=0.025)
-      upperRh <- apply(samp[,,3],2,quantile,probs=0.975)
+  lowerR <- 
+    apply(
+      samp[,,2],
+      2,
+      quantile,
+      probs = 0.025
+      )
   
- Rtype <- c(rep("R0=1.8",dim(pois_mean)[1]),rep("R0=2.5",dim(pois_mean)[1]),rep("R0=3.6",dim(pois_mean)[1]))
- Rtype <- factor(Rtype,levels=c("R0=1.8","R0=2.5","R0=3.6"))
-return(data.frame(times=rep(1:dim(pois_mean)[1],3),c(meanRl,meanR,meanRh),c(lowerRl,lowerR,lowerRh),
-                  c(upperRl,upperR,upperRh),Rtype))
+  upperR <- 
+    apply(
+      samp[,,2],
+      2,
+      quantile,
+      probs = 0.975
+      )
+  
+  meanRh <- 
+    apply(
+      samp[,,3],
+      2,
+      median
+      )
+    
+  lowerRh <- 
+    apply(
+      samp[,,3],
+      2,
+      quantile,
+      probs = 0.025
+      )
+  
+  upperRh <- 
+    apply(
+      samp[,,3],
+      2,
+      quantile,
+      probs = 0.975
+      )
+  
+ Rtype <- 
+   c(
+     rep("R0=1.8",dim(pois_mean)[1]),
+     rep("R0=2.5",dim(pois_mean)[1]),
+     rep("R0=3.6",dim(pois_mean)[1])
+     )
+ 
+ Rtype <- 
+   factor(
+     Rtype,
+     levels = c("R0=1.8","R0=2.5","R0=3.6")
+     )
+ 
+ 
+return(
+  data.frame(
+    times=rep(1:dim(pois_mean)[1],3),
+    c(meanRl,meanR,meanRh),
+    c(lowerRl,lowerR,lowerRh),
+    c(upperRl,upperR,upperRh),Rtype)
+  )
 
   }
+
+
+# cumulative cases for tau = 7
 
 sched_0 <- inf_time(50000,notestarray,150)
 sched_1 <- inf_time(50000,indarray,150)
@@ -41,13 +134,29 @@ sched_2 <- inf_time(50000,npool2array,150)
 sched_3 <- inf_time(50000,npool5array,150)
 sched_4 <- inf_time(50000,npool10array,150)
 
-type <- c(rep("synd",dim(sched_0)[1]),rep("ind",dim(sched_1)[1]),rep("npool2",dim(sched_2)[1]),rep("npool5",dim(sched_3)[1]),rep("npool10",dim(sched_4)[1]))
-type <- factor(type,levels=c("synd","ind","npool2","npool5","npool10"))
+
+type <- 
+  c(
+    rep("synd",dim(sched_0)[1]),
+    rep("ind",dim(sched_1)[1]),
+    rep("npool2",dim(sched_2)[1]),
+    rep("npool5",dim(sched_3)[1]),
+    rep("npool10",dim(sched_4)[1])
+    )
+
+type <- 
+  factor(
+    type,
+    levels = c("synd","ind","npool2","npool5","npool10")
+    )
 
 data_plot1 <- rbind(sched_0,sched_1,sched_2,sched_3,sched_4)
+
 data_plot1 <- cbind(type,data_plot1)
 
-###########################################
+
+
+# cumulative cases for tau = 14
 
 sched_5 <- inf_time(50000,notestarray2,150)
 sched_6 <- inf_time(50000,indarray2,150)
@@ -59,7 +168,8 @@ data_plot2 <- rbind(sched_5,sched_6,sched_7,sched_8,sched_9)
 data_plot2 <- cbind(type,data_plot2)
 
 
-#############################################
+
+# cumulative cases for tau = 28
 
 sched_10 <- inf_time(50000,notestarray3,150)
 sched_11 <- inf_time(50000,indarray3,150)
@@ -70,30 +180,100 @@ sched_14 <- inf_time(50000,npool10array3,150)
 data_plot3 <- rbind(sched_10,sched_11,sched_12,sched_13,sched_14)
 data_plot3 <- cbind(type,data_plot3)
 
+
+
+
+# 2.  Plot cumulative cases over time ----------------------------------------
+
+
 ## Make facet data
-resource <- c(rep("High resources",dim(data_plot1)[1]),rep("Medium resources",dim(data_plot2)[1]),rep("Low resources",dim(data_plot3)[1]))
-resource <- factor(resource,levels=c("High resources","Medium resources","Low resources"))
+
+resource <- 
+  c(
+    rep("High resources",dim(data_plot1)[1]),
+    rep("Medium resources",dim(data_plot2)[1]),
+    rep("Low resources",dim(data_plot3)[1])
+    )
+
+resource <- 
+  factor(
+    resource,
+    levels = c("High resources","Medium resources","Low resources")
+    )
+
 data_facetplot <- rbind(data_plot1,data_plot2,data_plot3)
 data_facetplot <- cbind(data_facetplot,resource)
+
 names(data_facetplot) <- c("type","times","mean","lower","upper","Rtype","resource")
 
-label.legend <- c("synd"="Syndromic","ind"="No pooling","npool2"=expression(n[pool]*"=2"),"npool5"=expression(n[pool]*"=5"),"npool10"=expression(n[pool]*"=10"))
+label.legend <- 
+  c("synd" = "Syndromic",
+    "ind" = "No pooling",
+    "npool2" = expression(n[pool]*"=2"),
+    "npool5" = expression(n[pool]*"=5"),
+    "npool10" = expression(n[pool]*"=10")
+    )
 
-data_facetplot$upper <- ifelse(data_facetplot$upper<=150,data_facetplot$upper,150)
-data_facetplot$mean  <- ifelse(data_facetplot$mean<=150,data_facetplot$mean,150)
+data_facetplot$upper <- 
+  ifelse(
+    data_facetplot$upper <= 150,
+    data_facetplot$upper,
+    150
+    )
 
-ggplot(data_facetplot, aes(x = times,fill=type)) +
-  geom_line(data_facetplot,mapping=aes(y=mean,x=times),size=0.5) + facet_grid(resource~Rtype) +
-  geom_ribbon(data_facetplot,mapping=aes(x=times,ymin=lower,ymax=upper),alpha=0.3) +
- xlab("Time since first infection (days)") + ylab('Cumulative number of cases')+ scale_fill_brewer(palette = "Dark2",labels=label.legend)+theme_bw()+labs(fill="Screening")+theme(legend.position = "bottom")
+data_facetplot$mean  <- 
+  ifelse(
+    data_facetplot$mean <= 150,
+    data_facetplot$mean,
+    150
+    )
+
+
+
+ggplot(
+  data_facetplot, 
+  aes(
+    x = times,
+    fill=type
+    )
+  ) +
+  geom_line(
+    data_facetplot,
+    mapping = aes(
+      y = mean,
+      x = times
+      ),
+    size=0.5
+    ) + 
+  facet_grid(
+    resource~Rtype
+    ) +
+  geom_ribbon(
+    data_facetplot,
+    mapping = aes(
+      x = times,
+      ymin = lower,
+      ymax = upper
+      ), 
+    alpha=0.3
+    ) +
+  xlab("Time since first infection (days)") + 
+  ylab('Cumulative number of cases') + 
+  scale_fill_brewer(
+    palette = "Dark2",
+    labels=label.legend
+    ) + 
+  theme_bw() + 
+  labs(fill = "Screening") + 
+  theme(legend.position = "bottom")
 
 
 
 
 
-########################################################
-# Find expected value of T under each testing strategy #
-########################################################
+# 3.  Expected time of detection T under each testing strategy ------------
+
+
 
 det_symp <- function(inc,symp){
   
@@ -116,45 +296,220 @@ det_symp <- function(inc,symp){
   return(c(time,timelow,timehigh))
 }
 
-E_synd <- ceiling(det_symp(c(6.7,5.2,8.2),0.65))
+E_synd <- 
+  ceiling(
+    det_symp(
+      c(6.7,5.2,8.2),0.65
+      )
+    )
 
-########## Low resources
+
+
+# Low resources
 
 tau_ind <- 21
 
-indlow <- sapply(a,function(x){Tcut_Hlow(x,tau_ind,1)})
-E_ind <- mean(density(indlow)$y)+1
+indlow <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,tau_ind,1)
+      }
+    )
 
-low_pool2 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2])})
-E_low2 <- mean(density(low_pool2)$y)+1
+E_ind <- 
+  mean(
+    density(indlow)$y
+    ) + 1
 
-low_pool5 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5])})
-E_low5 <- mean(density(low_pool5)$y)+1
+low_pool2 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(
+        x,
+        ceiling(
+          tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2]
+          ),
+        se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2]
+        )
+      }
+    )
 
-low_pool10 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==10])})
-E_low10 <- mean(density(low_pool10)$y)+1
+E_low2 <- 
+  mean(
+    density(
+      low_pool2)$y
+    ) + 1
+
+
+low_pool5 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(
+        x,
+        ceiling(
+          tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]
+          ),
+        se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5]
+        )
+      }
+    )
+
+
+E_low5 <-
+  mean(
+    density(
+      low_pool5)$y
+    ) + 1
+
+
+low_pool10 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(
+        x,
+        ceiling(
+          tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]
+          ),
+        se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==10]
+        )
+      }
+    )
+
+
+E_low10 <- 
+  mean(
+    density(
+      low_pool10)$y
+    ) + 1
+
 
 EtestLa <- c(E_ind,E_low2,E_low5,E_low10)
-EtestL1 <- c(E_synd[1],sapply(EtestLa,function(x){min(E_synd[1],x)}))
-EtestL2 <- c(E_synd[2],sapply(EtestLa,function(x){min(E_synd[2],x)}))
-EtestL3 <- c(E_synd[3],sapply(EtestLa,function(x){min(E_synd[3],x)}))
-EtestL <- c(EtestL1,EtestL2,EtestL3)
+
+EtestL1 <- 
+  c(
+    E_synd[1],
+    sapply(
+      EtestLa,
+      function(x){
+        min(
+          E_synd[1],
+          x
+          )
+        }
+      )
+    )
+
+EtestL2 <- 
+  c(
+    E_synd[2],
+    sapply(
+      EtestLa,
+      function(x){
+        min(
+          E_synd[2],
+          x
+          )
+        }
+      )
+    )
+
+
+EtestL3 <- 
+  c(
+    E_synd[3],
+    sapply(
+      EtestLa,
+      function(x){
+        min(
+          E_synd[3],
+          x
+          )
+        }
+      )
+    )
+
+
+EtestL <- 
+  c(
+    EtestL1,
+    EtestL2,
+    EtestL3
+    )
+
+
 
 ########### Medium resources
 
 tau_ind <- 14
 
-indmed <- sapply(a,function(x){Tcut_Hlow(x,tau_ind,1)})
-E_indM <- mean(density(indmed)$y)+1
+indmed <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,tau_ind,1)
+      }
+    )
 
-med_pool2 <- sapply(a,function(x){Tcut_Hlow(x,tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2],se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2])})
-E_med2 <- mean(density(med_pool2)$y)+1
 
-med_pool5 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5])})
-E_med5 <- mean(density(med_pool5)$y)+1
+E_indM <- 
+  mean(
+    density(indmed)$y
+    ) + 1
 
-med_pool10 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==10])})
-E_med10 <- mean(density(med_pool10)$y)+1
+med_pool2 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(
+        x,
+        tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2],
+        se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2]
+        )
+      }
+    )
+
+
+E_med2 <- mean(
+  density(med_pool2)$y
+  ) + 1
+
+
+med_pool5 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,
+                ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]),
+                se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5]
+                )
+      }
+    )
+
+E_med5 <- 
+  mean(
+    density(med_pool5)$y
+    ) + 1
+
+med_pool10 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,
+                ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]),
+                se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==10]
+                )
+      }
+    )
+
+
+E_med10 <- 
+  mean(
+    density(med_pool10)$y
+    ) + 1
 
 
 EtestMa <- c(E_indM,E_med2,E_med5,E_med10)
@@ -164,22 +519,72 @@ EtestM3 <- c(E_synd[3],sapply(EtestMa,function(x){min(E_synd[3],x)}))
 EtestM <- c(EtestM1,EtestM2,EtestM3)
 
 
+
 ########## High resources
 
 tau_ind <- 7
 
 
-indhigh <- sapply(a,function(x){Tcut_Hlow(x,tau_ind,1)})
-E_indH <- mean(density(indhigh)$y)+1
+indhigh <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,tau_ind,1)
+      }
+    )
 
-high_pool2 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2])})
-E_high2 <- mean(density(high_pool2)$y)+1
+E_indH <- 
+  mean(
+    density(indhigh)$y
+    ) + 1
 
-high_pool5 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5])})
-E_high5 <- mean(density(high_pool5)$y)+1
+high_pool2 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,
+                ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2]),
+                se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2]
+                )
+      }
+    )
+E_high2 <- 
+  mean(
+    density(high_pool2)$y
+    ) + 1
 
-high_pool10 <- sapply(a,function(x){Tcut_Hlow(x,ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]),se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==10])})
-E_high10 <- mean(density(high_pool10)$y)+1
+high_pool5 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(x,
+                ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]),
+                se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5]
+                )
+      }
+    )
+
+E_high5 <- 
+  mean(
+    density(high_pool5)$y
+    ) + 1
+
+high_pool10 <- 
+  sapply(
+    a,
+    function(x){
+      Tcut_Hlow(
+        x,
+        ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]),
+        se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==10]
+        )
+      }
+    )
+
+E_high10 <- 
+  mean(
+    density(high_pool10)$y
+    ) + 1
 
 EtestHa <- c(E_indH,E_high2,E_high5,E_high10)
 EtestH1 <- c(E_synd[1],sapply(EtestHa,function(x){min(E_synd[1],x)}))
@@ -187,52 +592,202 @@ EtestH2 <- c(E_synd[2],sapply(EtestHa,function(x){min(E_synd[2],x)}))
 EtestH3 <- c(E_synd[3],sapply(EtestHa,function(x){min(E_synd[3],x)}))
 EtestH <- c(EtestH1,EtestH2,EtestH3)
 
-meanH <- sapply(EtestH,function(x){sched_0$c.meanRl..meanR..meanRh.[sched_0$times==ceiling(x) & sched_0$Rtype=="R0=2.5"]})
-lowH <- sapply(EtestH,function(x){sched_0$c.lowerRl..lowerR..lowerRh.[sched_0$times==ceiling(x) & sched_0$Rtype=="R0=2.5"]})
-uppH <- sapply(EtestH,function(x){sched_0$c.upperRl..upperR..upperRh.[sched_0$times==ceiling(x) & sched_0$Rtype=="R0=2.5"]})
 
-meanM <- sapply(EtestM,function(x){sched_5$c.meanRl..meanR..meanRh.[sched_5$times==ceiling(x) & sched_5$Rtype=="R0=2.5"]})
-lowM <- sapply(EtestM,function(x){sched_5$c.lowerRl..lowerR..lowerRh.[sched_5$times==ceiling(x) & sched_5$Rtype=="R0=2.5"]})
-uppM <- sapply(EtestM,function(x){sched_5$c.upperRl..upperR..upperRh.[sched_5$times==ceiling(x) & sched_5$Rtype=="R0=2.5"]})
+## Expected values and CIs 
+meanH <- 
+  sapply(
+    EtestH,
+    function(x){
+      sched_0$c.meanRl..meanR..meanRh.[sched_0$times==ceiling(x) & sched_0$Rtype=="R0=2.5"]
+      }
+    )
 
-meanL <- sapply(EtestL,function(x){sched_10$c.meanRl..meanR..meanRh.[sched_10$times==ceiling(x) & sched_10$Rtype=="R0=2.5" ]})
-lowL <- sapply(EtestL,function(x){sched_10$c.lowerRl..lowerR..lowerRh.[sched_10$times==ceiling(x) & sched_10$Rtype=="R0=2.5"]})
-uppL <- sapply(EtestL,function(x){sched_10$c.upperRl..upperR..upperRh.[sched_10$times==ceiling(x) & sched_10$Rtype=="R0=2.5"]})
+lowH <- 
+  sapply(
+    EtestH,
+    function(x){
+      sched_0$c.lowerRl..lowerR..lowerRh.[sched_0$times==ceiling(x) & sched_0$Rtype=="R0=2.5"]
+      }
+    )
 
-
-resource <- c(rep("high",length(meanH)),rep("med",length(meanM)),rep("low",length(meanL)))
-resource <- factor(resource, levels=c("high","med","low"))
-sched <- c("synd","ind","npool2","npool5","npool10")
-sched <- factor(sched,levels=c("synd","ind","npool2","npool5","npool10"))
-sched <- rep(sched,9)
-incub <- rep(c(rep("medinc",5),rep("lowinc",5),rep("highinc",5)),3)
-incub <- factor(incub,levels=c("lowinc","medinc","highinc"))
-
-data_outsize <- data.frame(meanexp=c(meanH,meanM,meanL),low=c(lowH,lowM,lowL),upp=c(uppH,uppM,uppL),resource,sched,incub)
-label.legend <- c("synd"="Syndromic","ind"="No pooling","npool2"=expression(n[pool]*"=2"),"npool5"=expression(n[pool]*"=5"),
-                  "npool10"=expression(n[pool]*"=10"))
-label.res <- c("low"="Low resources","med"="Medium resources","high"="High resources")
-label.inc <- c("lowinc"="5.2 days","medinc"="6.7 days","highinc"="8.2 days")
-
-
-ggplot(data=data_outsize,aes(x=sched,y=meanexp,ymin=low,ymax=upp ,color=as.factor(sched)))+geom_pointrange()+
-  scale_color_viridis(discrete=TRUE,labels=label.legend)+theme_bw()+
-  facet_grid(resource~incub, labeller = labeller(resource=label.res,incub=label.inc))+
-  theme(legend.title = element_text(size = 11),legend.text = element_text(size = 10), legend.position="bottom",
-        axis.text=element_text(size=10),axis.text.x=element_blank(),axis.ticks.x=element_blank(),
-        axis.title=element_text(size=11))+labs(color="")+xlab("")+ylab("Size of outbreak")
+uppH <- 
+  sapply(
+    EtestH,
+    function(x){
+      sched_0$c.upperRl..upperR..upperRh.[sched_0$times==ceiling(x) & sched_0$Rtype=="R0=2.5"]
+      }
+    )
 
 
+meanM <- 
+  sapply(
+    EtestM,
+    function(x){
+      sched_5$c.meanRl..meanR..meanRh.[sched_5$times==ceiling(x) & sched_5$Rtype=="R0=2.5"]
+      }
+    )
+
+lowM <- 
+  sapply(
+    EtestM,
+    function(x){
+      sched_5$c.lowerRl..lowerR..lowerRh.[sched_5$times==ceiling(x) & sched_5$Rtype=="R0=2.5"]
+      }
+    )
+
+uppM <- 
+  sapply(
+    EtestM,
+    function(x){
+      sched_5$c.upperRl..upperR..upperRh.[sched_5$times==ceiling(x) & sched_5$Rtype=="R0=2.5"]
+      }
+    )
+
+
+meanL <- 
+  sapply(
+    EtestL,
+    function(x){
+      sched_10$c.meanRl..meanR..meanRh.[sched_10$times==ceiling(x) & sched_10$Rtype=="R0=2.5" ]
+      }
+    )
+
+lowL <- 
+  sapply(
+    EtestL,
+    function(x){
+      sched_10$c.lowerRl..lowerR..lowerRh.[sched_10$times==ceiling(x) & sched_10$Rtype=="R0=2.5"]
+      }
+    )
+
+uppL <- 
+  sapply(
+    EtestL,
+    function(x){
+      sched_10$c.upperRl..upperR..upperRh.[sched_10$times==ceiling(x) & sched_10$Rtype=="R0=2.5"]
+      }
+    )
+
+
+resource <- 
+  c(
+    rep("high",length(meanH)),
+    rep("med",length(meanM)),
+    rep("low",length(meanL))
+    )
+
+resource <- 
+  factor(
+    resource, 
+    levels = c("high","med","low")
+    )
+
+sched <- c("synd", "ind", "npool2", "npool5", "npool10")
+sched <- 
+  factor(
+    sched, 
+    levels = c("synd",
+               "ind",
+               "npool2",
+               "npool5",
+               "npool10"
+               )
+    )
+
+sched <- rep(sched, 9)
+incub <- 
+  rep(
+    c(
+      rep("medinc", 5), 
+      rep("lowinc", 5), 
+      rep("highinc", 5)
+      ), 
+    3)
+
+incub <- 
+  factor(
+    incub,
+    levels = c("lowinc",
+               "medinc",
+               "highinc"
+               )
+    )
+
+
+
+# 4.  Plot expected cases  ------------------------------------------------
+
+
+
+data_outsize <- 
+  data.frame(
+    meanexp = c(meanH,meanM,meanL),
+    low = c(lowH,lowM,lowL),
+    upp = c(uppH,uppM,uppL),
+    resource,
+    sched,
+    incub )
+
+label.legend <- 
+  c("synd" = "Syndromic",
+    "ind" = "No pooling",
+    "npool2" = expression(n[pool]*"=2"),
+    "npool5" = expression(n[pool]*"=5"),
+    "npool10" = expression(n[pool]*"=10")
+    )
+
+label.res <- 
+  c("low" = "Low resources",
+    "med" = "Medium resources",
+    "high" = "High resources")
+
+label.inc <- 
+  c("lowinc" = "5.2 days",
+    "medinc" = "6.7 days",
+    "highinc" = "8.2 days")
+
+
+ggplot(
+  data = data_outsize,
+  aes(
+    x = sched,
+    y = meanexp,
+    ymin = low,
+    ymax = upp, 
+    color = as.factor(sched)
+    )
+  ) + 
+  geom_pointrange() +
+  scale_color_viridis(
+    discrete = TRUE,
+    labels = label.legend
+    ) + 
+  theme_bw()+
+  facet_grid(resource~incub, 
+             labeller = labeller(resource=label.res,incub=label.inc)
+             ) +
+  theme(legend.title = element_text(size = 11),
+        legend.text = element_text(size = 10), 
+        legend.position="bottom",
+        axis.text = element_text(size=10),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size=11)
+        ) + 
+  labs(color="") + 
+  xlab("") + 
+  ylab("Size of outbreak")
 
 
 
 
-###########################
-# Sensitivity analysis 
-##########################
+
+# 5.  Sensitivity analysis ------------------------------------------------
 
 
-# Assume Kucirka model of sens
+## Sensitivity analysis 1 
+
+### Assume Kucirka model of sens
 
 RE.simul.K <- function(N,
                        pop_size, 
