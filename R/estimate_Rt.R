@@ -101,7 +101,14 @@ a <- seq(0,30,1) # Time since index infection (days)
  intTa <- function(a,tau,rel){
    
    integ <- 1-unlist(sapply(a,function(x){
-            adaptIntegrate(Tcut_Hlow,lower = 0,upper = x,tau=tau,rel=rel)})[1,])
+            adaptIntegrate(Tcut_Hlow,
+                           lower = 0,
+                           upper = x,
+                           tau=tau,
+                           rel=rel
+                           )
+     }
+     )[1,])
    
    return(integ)
  }
@@ -110,7 +117,14 @@ a <- seq(0,30,1) # Time since index infection (days)
  intTK <- function(a,tau,rel){
    
    integ <- 1-unlist(sapply(a,function(x){
-     adaptIntegrate(Tcut_K,lower = 0,upper = x,tau=tau,rel=rel)})[1,])
+     adaptIntegrate(Tcut_K,
+                    lower = 0,
+                    upper = x,
+                    tau=tau,
+                    rel=rel
+                    )
+     }
+     )[1,])
    
    return(integ)
  }
