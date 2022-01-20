@@ -433,11 +433,11 @@ ggplot(
 
 ## Assume same proportion of symptomatic for omicron and delta - CHECK
 
-inc_del = 5 # check and change
-inc_omi = 4 # check and change
+inc_del = 4 # check and change
+inc_omi = 3 # check and change
   
-symp_del = 0.65 # check and change
-symp_omi = 0.65 # check and change
+symp_del = 0.5 # check and change
+symp_omi = 0.5 # check and change
 
 
 
@@ -449,12 +449,15 @@ E_synd <- purrr::pmap(list(inc = c(inc_del, inc_omi),
                      ) # add ceiling to code
 
 
+# Lists for testing strategies
+# testing frequency under each stategy
 tau_E <- c(tau_ind,
            ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2]),
            ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==5]),
            ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==10]),
            tau_rapid)
 
+# sensitivity under each strategy
 sens_E <- c(1,
             se_time_H(a)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2],
             se_time_H(a)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==5],
@@ -462,35 +465,73 @@ sens_E <- c(1,
             se_time_ant(a))
 
 
- 
-surv_del <- 
-  purrr::pmap(list(tau = tau_E,
-                   rel = sens_E),
-              Tcut_Hlow, # edit this to include rapid tests also
-              a = 1)
+sens_E <- c(1,
+            sens_HCWp1$Sensitivity[sens_HCWp1$npool==2],
+            sens_HCWp1$Sensitivity[sens_HCWp1$npool==5],
+            sens_HCWp1$Sensitivity[sens_HCWp1$npool==10],
+            1)
 
 
-Exp_val <- # need to sort out different lengths
+
+# Find T 
+
+#' Distribution of expected time of detection
+#' @param a age of infection
+#' @param tau frequency of testing
+#' @param sens rel sensitivity of testing strategy
+
+
+Exp_T <- function(a, tau, sens){
+
+  res_ind <- vector()
+  res_pool2 <- vector()
+  res_pool5 <- vector()
+  res_pool10 <- vector()
+  res_rapid <- vector()
   
-indhigh <- sapply(a,
-                  function(x){
-                    Tcut_Hlow(x,tau_ind,1)
-                  }
-)
+  
+  for(i in 1:length(a)){
+    
+    rel = sens*se_time_H(a = i)
+    
+    PrT = 
+      purrr::pmap(list(tau = tau,
+                       rel = rel),
+                  Tcut_Hlow, # edit this to include rapid tests also
+                  a = i)
+    
+    
+    # results for each testing strategy
+     res_ind <- c(res_ind, unlist(PrT)[1])
+     res_pool2 <- c(res_pool2, unlist(PrT)[2])
+     res_pool5 <- c(res_pool5, unlist(PrT)[3])
+     res_pool10 <- c(res_pool10, unlist(PrT)[4])
+     res_rapid <- c(res_rapid, unlist(PrT)[5])
+    
+    
+  }
+  
+  
+  # Expected value of T for each testing strategy
+  
+  f_res <- function(a, res){ sum(a*res) + 1 }
+  
+  E_T = 
+    purrr::pmap(.l = list(res_ind,
+                          res_pool2,
+                          res_pool5,
+                          res_pool10,
+                          res_rapid),
+                .f = f_res,
+                a = a
+    )
+  
+  
+  # return E(T)
+  return(E_T)
+}
 
-E_indH <- mean(density(indhigh)$y
-) + 1
-
-high_pool2 <- sapply(a,
-                     function(x){
-                       Tcut_Hlow(x,
-                                 ceiling(tau_ind*sens_HCWp1$eff[sens_HCWp1$npool==2]),
-                                 se_time_H(x)*sens_HCWp1$Sensitivity[sens_HCWp1$npool==2]
-                       )
-                     }
-)
-E_high2 <- mean(density(high_pool2)$y
-) + 1
+  
 
 
 

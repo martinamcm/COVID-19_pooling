@@ -15,6 +15,7 @@ pacman::p_load(
   )
 
 conflict_prefer("mutate", "dplyr")
+conflict_prefer("filter", "dplyr")
 
 # Load scripts
 
