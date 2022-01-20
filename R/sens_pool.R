@@ -9,7 +9,7 @@
 # Screening of healthcare workers for SARS-CoV-2 highlights the role of asymptomatic 
 # carriage in COVID-19 transmission. Elife 2020; 9: e58728.
 
-sens_HCW <- read.csv(here("data", "SensPool_HCWscreen.csv"))
+sens_HCW <- read.csv(file.path("data/SensPool_HCWscreen.csv"))
 sens_HCW <- sens_HCW[sens_HCW$Prevalence<5,]
 
 se = sens_HCW$Sensitivity <- sens_HCW$Sensitivity/100

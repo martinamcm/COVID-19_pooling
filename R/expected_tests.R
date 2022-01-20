@@ -14,7 +14,7 @@
 # H., Halaihel, N. & De Blas, I. Estimation of the relative sensitivity of qPCR analysis 
 # using pooled samples. PLoS One e93491 (2014) doi:10.1371/journal.pone.0093491.
 
-  sens_HCW <- read.csv(here("data", "SensPool_HCWscreen.csv")) # read data
+  sens_HCW <- read.csv(file.path("data/SensPool_HCWscreen.csv")) # read data
   sens_HCW <- sens_HCW[sens_HCW$Prevalence<2,] # restrict to prevalence values of less than 2%
   
   sens_p001 <- sens_HCW[which(sens_HCW$Prevalence==1),] # prevalence = 1%

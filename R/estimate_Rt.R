@@ -46,7 +46,29 @@ a <- seq(0,30,1) # Time since index infection (days)
      )
  }
 
-
+   
+ # Self administered rapid antigen tests 
+   # make sens proportional to infectiousness
+   
+   
+   se_time_ant <- 
+      function(t = a,
+               max_sensitivity = 0.95, 
+               shape = sh_del, 
+               scale = sc_del) {
+     
+      # dgamma from generation dist assumed
+      d_gen <- function(t) dgamma(t, shape=shape, scale=scale)
+      
+      # scale sens to infectiousness
+      scale_sensitivity <- 
+         max_sensitivity / max(d_gen(a)) 
+     
+      # Sensitivity proportional to infectiousness
+      scale_sensitivity * d_gen(t) 
+   }
+   
+   
 
 # Survivor functions P(T>tau) ---------------------------------------------
 
@@ -130,8 +152,45 @@ a <- seq(0,30,1) # Time since index infection (days)
  }
   
  
+ # Rapid antigen tests
+ 
+ Tcut_Hrapid <- function(a,tau,rel){
+   
+   if(a<tau){
+     se_tau <- rel*se_time_ant(a)/tau
+     PrTa <- se_tau
+   }
+   
+   else{
+     se_tau <- rel*se_time_ant(a)/tau
+     k <- floor(a-1/tau)
+     inputi <- sapply(k,function(x){c(1:x)})
+     input <- mapply(function(x,y){
+       y-x*tau},x=inputi,y=a  )
+     se_a <- sapply(input,function(x){(1-rel*se_time_ant(x))})
+     se_Ta <- mapply(function(x){prod(x)},x=list(se_a))
+     PrTa <- unlist(se_Ta)*se_tau
+     
+   }
+   
+   return(PrTa)
+ }
  
 
+ intTa_rapid <- function(a,tau,rel){
+   
+   integ <- 1-unlist(sapply(a,function(x){
+     adaptIntegrate(Tcut_Hrapid,
+                    lower = 0,
+                    upper = x,
+                    tau=tau,
+                    rel=rel
+     )
+   }
+   )[1,])
+   
+   return(integ)
+ }
 
 # Transmission curve ------------------------------------------------------
 
@@ -152,6 +211,18 @@ tran_curve_H <- function(a, tau, rel, shape, scale, R0){
   
   lambda = R0*dgamma(a,shape=shape,scale=scale)
   ProbTa = intTa(a,tau,rel)
+  
+  tran = lambda*ProbTa
+  
+  return(tran)
+  
+}
+
+
+tran_curve_rapid <- function(a, tau, rel, shape, scale, R0){
+  
+  lambda = R0*dgamma(a,shape=shape,scale=scale)
+  ProbTa = intTa_rapid(a,tau,rel)
   
   tran = lambda*ProbTa
   
